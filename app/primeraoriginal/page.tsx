@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 export default function Page() {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const shipRef = useRef({ x: 0, y: 0, w: 40, h: 18 });
+	const moveIntervalRef = useRef<number | null>(null);
 	const [running, setRunning] = useState(false);
 	const [score, setScore] = useState(0);
 	const [gameOver, setGameOver] = useState(false);
@@ -124,6 +125,16 @@ export default function Page() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [running, gameOver]);
 
+	// cleanup any movement interval on unmount
+	useEffect(() => {
+		return () => {
+			if (moveIntervalRef.current) {
+				clearInterval(moveIntervalRef.current);
+				moveIntervalRef.current = null;
+			}
+		};
+	}, []);
+
 	useEffect(() => {
 		const onPointer = (clientX: number) => {
 			const canvas = canvasRef.current;
@@ -157,13 +168,57 @@ export default function Page() {
 		setScore(0);
 	}
 
+	function startMove(dir: number) {
+		if (moveIntervalRef.current) return;
+		moveIntervalRef.current = window.setInterval(() => {
+			const c = canvasRef.current;
+			if (!c) return;
+			const s = shipRef.current;
+			const next = s.x + dir * 6; // speed
+			s.x = Math.max(20, Math.min(c.width - 20, next));
+		}, 16) as unknown as number;
+	}
+
+	function stopMove() {
+		if (moveIntervalRef.current) {
+			clearInterval(moveIntervalRef.current);
+			moveIntervalRef.current = null;
+		}
+	}
+
 	return (
 		<main className="p-6 min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white flex flex-col items-center">
 			<h1 className="text-3xl font-bold mb-4">Esquivar el Asteroide</h1>
 			<p className="mb-4 text-sm text-slate-300">Mueve el ratón (o toca) para desplazar la nave. Evita los asteroides.</p>
 			<canvas ref={canvasRef} className="rounded-md shadow-lg border border-slate-700" />
 
+			{/* Mobile touch controls: visible on small screens only */}
 			<div className="mt-4 flex gap-3">
+				<div className="flex w-full justify-center sm:hidden gap-4">
+					<button
+						onPointerDown={() => startMove(-1)}
+						onPointerUp={() => stopMove()}
+						onPointerCancel={() => stopMove()}
+						onTouchStart={() => startMove(-1)}
+						onTouchEnd={() => stopMove()}
+						className="w-28 h-12 bg-slate-700/60 rounded-lg text-white font-semibold"
+					>
+						◀︎ Izquierda
+					</button>
+					<button
+						onPointerDown={() => startMove(1)}
+						onPointerUp={() => stopMove()}
+						onPointerCancel={() => stopMove()}
+						onTouchStart={() => startMove(1)}
+						onTouchEnd={() => stopMove()}
+						className="w-28 h-12 bg-slate-700/60 rounded-lg text-white font-semibold"
+					>
+						Derecha ▶︎
+					</button>
+				</div>
+
+				{/* Desktop/control buttons (kept visible) */}
+				<div className="hidden sm:flex gap-3">
 				{!running && !gameOver && (
 					<button onClick={startGame} className="bg-yellow-400 text-slate-900 px-4 py-2 rounded-md font-semibold">Empezar</button>
 				)}
@@ -176,6 +231,7 @@ export default function Page() {
 						<button onClick={startGame} className="bg-green-500 px-3 py-1 rounded-md">Reintentar</button>
 					</div>
 				)}
+				</div>
 			</div>
 		</main>
 	);
