@@ -18,10 +18,12 @@ export default function Page() {
 		let ctx = canvas.getContext("2d");
 
 		function resize() {
-			canvas.width = Math.min(600, window.innerWidth - 40);
-			canvas.height = 480;
-			shipRef.current.x = canvas.width / 2;
-			shipRef.current.y = canvas.height - 32;
+			const c = canvasRef.current;
+			if (!c) return;
+			c.width = Math.min(600, window.innerWidth - 40);
+			c.height = 480;
+			shipRef.current.x = c.width / 2;
+			shipRef.current.y = c.height - 32;
 		}
 
 		resize();
@@ -34,20 +36,24 @@ export default function Page() {
 		let scoreInterval: number | undefined;
 
 		function spawn(now: number) {
+			const c = canvasRef.current;
+			if (!c) return;
 			const difficulty = Math.max(400 - Math.floor((now - startTime) / 2000), 120);
 			if (now - lastSpawn > difficulty) {
-				asts.push({ x: Math.random() * (canvas.width - 20) + 10, y: -20, r: 8 + Math.random() * 18, speed: 1 + Math.random() * 2 + score / 200 });
+				asts.push({ x: Math.random() * (c.width - 20) + 10, y: -20, r: 8 + Math.random() * 18, speed: 1 + Math.random() * 2 + score / 200 });
 				lastSpawn = now;
 			}
 		}
 
 		function draw() {
-			if (!ctx) ctx = canvas.getContext("2d");
+			const c = canvasRef.current;
+			if (!c) return;
+			if (!ctx) ctx = c.getContext("2d");
 			if (!ctx) return;
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.clearRect(0, 0, c.width, c.height);
 			// background
 			ctx.fillStyle = "#081229";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.fillRect(0, 0, c.width, c.height);
 
 			// ship (triangle)
 			const ship = shipRef.current;
@@ -85,9 +91,11 @@ export default function Page() {
 
 		function update(now: number) {
 			if (gameOver) return;
+			const c = canvasRef.current;
+			if (!c) return;
 			spawn(now);
 			for (const a of asts) a.y += a.speed;
-			asts = asts.filter((a) => a.y - a.r < canvas.height + 40);
+			asts = asts.filter((a) => a.y - a.r < c.height + 40);
 			for (const a of asts) {
 				if (checkCollision(a)) {
 					setGameOver(true);
