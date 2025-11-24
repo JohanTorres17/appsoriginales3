@@ -45,33 +45,36 @@ export default function Page() {
 	}
 
 	return (
-		<main className="p-6 min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 flex flex-col items-center text-slate-900">
-			<h1 className="text-3xl font-bold mb-2">¿Qué carta sigue?</h1>
-			<p className="mb-4 text-sm text-rose-700">Observa la secuencia y elige la carta que sigue.</p>
-			<div className="bg-white rounded-lg shadow-md p-6 w-full max-w-xl text-slate-900">
-				<div className="flex justify-center gap-4 mb-4">
-					{q.seq.map((r, i) => (
-						<div key={i} className="w-20 h-28 rounded-md border flex flex-col justify-between p-2 items-start text-xl" style={{ background: "white" }}>
-							<div className="text-sm">{SUITS[q.suit]}</div>
-							<div className="text-2xl font-semibold mt-4">{RANKS[(r + 52) % 13]}</div>
-							<div className="text-sm self-end">{SUITS[q.suit]}</div>
+		<main className="p-4 sm:p-6 min-h-screen bg-gradient-to-b from-rose-50 to-rose-100 flex flex-col items-center text-slate-900">
+			<div className="app-inner">
+				<h1 className="text-2xl sm:text-3xl font-bold mb-2">¿Qué carta sigue?</h1>
+				<p className="mb-4 text-sm text-rose-700">Observa la secuencia y elige la carta que sigue.</p>
+
+				<div className="bg-white rounded-lg shadow-md p-4 sm:p-6 w-full max-w-xl text-slate-900 card">
+					<div className="flex justify-center gap-3 mb-4">
+						{q.seq.map((r, i) => (
+							<div key={i} className="w-20 h-28 rounded-md border flex flex-col justify-between p-2 items-start text-xl bg-white">
+								<div className="text-sm">{SUITS[q.suit]}</div>
+								<div className="text-2xl font-semibold mt-4">{RANKS[(r + 52) % 13]}</div>
+								<div className="text-sm self-end">{SUITS[q.suit]}</div>
+							</div>
+						))}
+					</div>
+
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+						{q.choices.map((c, i) => (
+							<button key={i} onClick={() => answer(c)} className="touch-button btn-ghost p-3 text-lg">
+								<div className="text-lg">{SUITS[q.suit]}{RANKS[(c + 52) % 13]}</div>
+							</button>
+						))}
+					</div>
+
+					<div className="mt-4 flex flex-col sm:flex-row sm:justify-between items-stretch sm:items-center gap-3">
+						<div>Puntuación: <strong>{score}</strong></div>
+						<div className="flex gap-2 w-full sm:w-auto">
+							<button onClick={() => setQ(makeQuestion())} className="btn-primary">Siguiente</button>
+							<button onClick={() => { setScore(0); setQ(makeQuestion()); }} className="btn-ghost">Reiniciar</button>
 						</div>
-					))}
-				</div>
-
-				<div className="grid grid-cols-2 gap-3">
-					{q.choices.map((c, i) => (
-						<button key={i} onClick={() => answer(c)} className="p-3 bg-rose-50 border rounded-md hover:bg-rose-100">
-							<div className="text-lg">{SUITS[q.suit]}{RANKS[(c + 52) % 13]}</div>
-						</button>
-					))}
-				</div>
-
-				<div className="mt-4 flex justify-between items-center">
-					<div>Puntuación: <strong>{score}</strong></div>
-					<div className="flex gap-2">
-						<button onClick={() => setQ(makeQuestion())} className="px-3 py-1 bg-yellow-200 rounded">Siguiente</button>
-						<button onClick={() => { setScore(0); setQ(makeQuestion()); }} className="px-3 py-1 bg-red-200 rounded">Reiniciar</button>
 					</div>
 				</div>
 			</div>

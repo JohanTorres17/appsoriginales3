@@ -188,22 +188,22 @@ export default function Page() {
 
 	return (
 		<main className="p-6 min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white flex flex-col items-center">
-			<h1 className="text-3xl font-bold mb-4">Esquivar el Asteroide</h1>
-			<p className="mb-4 text-sm text-slate-300">Mueve el ratón (o toca) para desplazar la nave. Evita los asteroides.</p>
-			<canvas ref={canvasRef} className="rounded-md shadow-lg border border-slate-700" />
+			<div className="app-inner w-full">
+				<h1 className="text-3xl font-bold mb-4">Esquivar el Asteroide</h1>
+				<p className="mb-4 text-sm text-slate-300">Mueve el ratón (o toca) para desplazar la nave. Evita los asteroides.</p>
+				<canvas ref={canvasRef} className="canvas-responsive rounded-md shadow-lg border border-slate-700 w-full mx-auto" />
 
-			{/* Mobile touch controls: visible on small screens only */}
-			<div className="mt-4 flex gap-3">
-				<div className="flex w-full justify-center sm:hidden gap-4">
+				{/* Mobile touch controls: overlay fixed bottom on small screens */}
+				<div className="touch-controls sm:hidden">
 					<button
 						onPointerDown={() => startMove(-1)}
 						onPointerUp={() => stopMove()}
 						onPointerCancel={() => stopMove()}
 						onTouchStart={() => startMove(-1)}
 						onTouchEnd={() => stopMove()}
-						className="w-28 h-12 bg-slate-700/60 rounded-lg text-white font-semibold"
+						className="touch-button"
 					>
-						◀︎ Izquierda
+						◀ Izquierda
 					</button>
 					<button
 						onPointerDown={() => startMove(1)}
@@ -211,26 +211,26 @@ export default function Page() {
 						onPointerCancel={() => stopMove()}
 						onTouchStart={() => startMove(1)}
 						onTouchEnd={() => stopMove()}
-						className="w-28 h-12 bg-slate-700/60 rounded-lg text-white font-semibold"
+						className="touch-button"
 					>
-						Derecha ▶︎
+						Derecha ▶
 					</button>
 				</div>
 
-				{/* Desktop/control buttons (kept visible) */}
-				<div className="hidden sm:flex gap-3">
-				{!running && !gameOver && (
-					<button onClick={startGame} className="bg-yellow-400 text-slate-900 px-4 py-2 rounded-md font-semibold">Empezar</button>
-				)}
-				{running && (
-					<button onClick={() => setRunning(false)} className="bg-red-500 px-4 py-2 rounded-md">Pausar</button>
-				)}
-				{gameOver && (
-					<div className="flex items-center gap-3">
-						<span className="text-lg">¡Juego terminado! Puntuación: {score}</span>
-						<button onClick={startGame} className="bg-green-500 px-3 py-1 rounded-md">Reintentar</button>
-					</div>
-				)}
+				{/* Control buttons (visible on all sizes) */}
+				<div className="mt-4 w-full max-w-md mx-auto flex flex-col gap-3">
+					{!running && !gameOver && (
+						<button onClick={startGame} className="btn-primary">Empezar</button>
+					)}
+					{running && (
+						<button onClick={() => setRunning(false)} className="btn-ghost">Pausar</button>
+					)}
+					{gameOver && (
+						<div className="flex flex-col gap-2 items-center">
+							<span className="text-lg">¡Juego terminado! Puntuación: {score}</span>
+							<button onClick={startGame} className="btn-primary">Reintentar</button>
+						</div>
+					)}
 				</div>
 			</div>
 		</main>
